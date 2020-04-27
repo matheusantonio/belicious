@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using belicious.Models;
+using belicious.Models.Persistence;
 using belicious.Models.ViewModels;
 
 namespace belicious.Controllers
@@ -16,56 +18,48 @@ namespace belicious.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly BookmarksContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, BookmarksContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            // Add most updated bookmark recovery
-
             TopBookmarkViewModel indexBookmarks = new TopBookmarkViewModel();
 
-            //Remove everything below this later
             indexBookmarks.topBookmarks = new List<Bookmark>();
 
-            indexBookmarks.topBookmarks.Add(
-                new Bookmark{
-                    urlLink = "google.com",
-                    name = "Google"
-                }
-            );
-            indexBookmarks.topBookmarks.Add(
-                new Bookmark{
-                    urlLink = "facebook.com",
-                    name= "Facebook"
-                }
-            );
+            var topBookmarks = (from tb in (from ub in _context.UserBookmarks
+                                group ub by ub.bookmarkId into oub
+                                select new { key = oub.Key, cnt = oub.Count()})
+                                orderby tb.cnt
+                                select tb).Take(10);
+
+            foreach(var item in topBookmarks.ToList())
+            {
+                string bookmarkId = item.key;
+
+                indexBookmarks.topBookmarks.Add(
+                    _context.Bookmarks.Find(bookmarkId)
+                );
+            }
+
 
             indexBookmarks.recentlyAdded = new List<Bookmark>();
 
-            indexBookmarks.recentlyAdded.Add(
-                new Bookmark{
-                    urlLink = "youtube.com",
-                    name = "Youtube"
-                }
-            );
-            indexBookmarks.recentlyAdded.Add(
-                new Bookmark{
-                    urlLink = "reddit.com",
-                    name= "Reddit"
-                }
-            );
-            indexBookmarks.recentlyAdded.Add(
-                new Bookmark{
-                    urlLink = "quora.com",
-                    name= "Quora"
-                }
-            );
-            //*******************
+            var recentBookmarks = (from ub in _context.UserBookmarks
+                                  orderby ub.addedTime
+                                  select ub.bookmarkId).Take(10);
 
+            foreach(var bookmarkId in recentBookmarks.ToList())
+            {
+                indexBookmarks.recentlyAdded.Add(
+                    _context.Bookmarks.Find(bookmarkId)
+                );
+            }
 
             return View(indexBookmarks);
         }
