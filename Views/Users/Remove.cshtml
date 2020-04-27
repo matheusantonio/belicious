@@ -1,0 +1,23 @@
+@model belicious.Models.ViewModels.RemoveBookmarkViewModel
+@{
+    ViewData["Title"] = @Model.userName;
+}
+
+<div >
+    <h2 class="display-6">@Model.userName - Remove bookmark?</h2>
+    <hr>
+    <div>
+        @Html.DisplayNameFor(Model => Model.url):
+        @Html.DisplayFor(Model => Model.url)
+    </div>
+    <br>
+    <div>
+        @Html.DisplayNameFor(Model => Model.addedDate):
+        @Html.DisplayFor(Model => Model.addedDate)
+    </div>
+    <br>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="bookmarkId" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</div>

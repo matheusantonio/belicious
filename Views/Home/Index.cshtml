@@ -1,0 +1,40 @@
+﻿@model belicious.Models.ViewModels.TopBookmarkViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Belicious - A Bookmark App</h1>
+    <hr>
+</div>
+<br>
+<br>
+<div class="text-left">
+    <h3 class="display-5">Top Bookmarks</h3>
+
+</div>
+<hr>
+@foreach (var item in Model.topBookmarks)
+{
+    <div>
+        <h5 class="display-7">@item.name</h5><p>@item.urlLink</p>
+        <hr>
+    </div>
+    
+}
+
+<br>
+<br>
+<div class="text-left">
+    <h3 class="display-5">Recently Added Bookmarks</h3>
+
+</div>
+<hr>
+@foreach (var item in Model.recentlyAdded)
+{
+    <div>
+        <h5 class="display-7">@item.name</h5><p>@item.urlLink</p>
+        <hr>
+    </div>
+    
+}
