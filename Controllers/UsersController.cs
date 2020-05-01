@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using belicious.Models;
 using belicious.Models.Persistence;
@@ -34,10 +35,23 @@ namespace belicious.Controllers
                                 && bm.bookmarkId == ub.bookmarkId
                                 select bm;
 
+            Dictionary<Bookmark, List<string>> bookmarks = new Dictionary<Bookmark, List<string>>();
+
+            foreach(var bookmark in userBookmarks)
+            {
+                var tags = (from t in _context.Tags
+                           from tb in _context.TagBookmarks
+                           where t.tagId == tb.tagId
+                           && tb.bookmarkId == bookmark.bookmarkId
+                           select t.tag).ToList();
+                
+                bookmarks.Add(bookmark, tags);
+            }
+
             UserBookmarkViewModel userBookmark = new UserBookmarkViewModel
             {
                 userName = username,
-                bookmarks = userBookmarks.ToList()
+                bookmarks = bookmarks
             };
 
             return View(userBookmark);
@@ -47,7 +61,8 @@ namespace belicious.Controllers
         {
             NewBookmarkViewModel userBookmark = new NewBookmarkViewModel
             {
-                userName = _userManager.GetUserName(User)
+                userName = _userManager.GetUserName(User),
+                tags = new List<string>()
             };
 
             return View(userBookmark);

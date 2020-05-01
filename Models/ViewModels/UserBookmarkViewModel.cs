@@ -6,8 +6,9 @@ namespace belicious.Models.ViewModels
     {
         public string userName {get; set;}
 
-        public List<Bookmark> bookmarks {get; set;}
+        //public List<Bookmark> bookmarks {get; set;}
 
+        public Dictionary<Bookmark, List<string>> bookmarks {get; set;}
     }
 }
 

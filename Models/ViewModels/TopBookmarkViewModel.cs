@@ -6,6 +6,10 @@ namespace belicious.Models.ViewModels
     {
         public List<Bookmark> topBookmarks {get; set;}
 
+        //public Dictionary<Bookmark, List<string>> topBookmarks {get; set;}
+
         public List<Bookmark> recentlyAdded {get; set;}
+
+        //public Dictionary<Bookmark, List<string>> recentlyAdded {get; set;}
     }
 }

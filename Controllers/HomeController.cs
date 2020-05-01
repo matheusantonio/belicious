@@ -46,7 +46,7 @@ namespace belicious.Controllers
                     _context.Bookmarks.Find(bookmarkId)
                 );
             }
-
+ 
 
             indexBookmarks.recentlyAdded = new List<Bookmark>();
 
