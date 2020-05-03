@@ -33,19 +33,23 @@ namespace belicious.Controllers
                                 from bm in _context.Bookmarks
                                 where ub.userId == currentUser
                                 && bm.bookmarkId == ub.bookmarkId
-                                select bm;
+                                select new {bookmarks = bm, name = ub.userDefinedName};
 
-            Dictionary<Bookmark, List<string>> bookmarks = new Dictionary<Bookmark, List<string>>();
+            List<Tuple<Bookmark, List<string>, string>> bookmarks = new List<Tuple<Bookmark, List<string>, string>>();
 
-            foreach(var bookmark in userBookmarks)
+            foreach(var item in userBookmarks)
             {
+                Bookmark bookmark = item.bookmarks;
+
                 var tags = (from t in _context.Tags
                            from tb in _context.TagBookmarks
                            where t.tagId == tb.tagId
                            && tb.bookmarkId == bookmark.bookmarkId
                            select t.tag).ToList();
                 
-                bookmarks.Add(bookmark, tags);
+                bookmarks.Add(new Tuple<Bookmark, List<string>, string>(bookmark,
+                                                                        tags,
+                                                                        item.name));
             }
 
             UserBookmarkViewModel userBookmark = new UserBookmarkViewModel
@@ -72,25 +76,40 @@ namespace belicious.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> New(NewBookmarkViewModel newUserBookmark)
         {
-            Bookmark bookmark = new Bookmark{
-                urlLink = newUserBookmark.url
-            };
-            bookmark.setName();
+            
+            var checkBookmark = (from bm in _context.Bookmarks
+                                where bm.urlLink == newUserBookmark.url
+                                select bm).FirstOrDefault();
+            
+            string bookmarkId;
+            
+            if(checkBookmark != null)
+            {
+                bookmarkId = checkBookmark.bookmarkId;
 
-            _context.Bookmarks.Add(bookmark);
-            await _context.SaveChangesAsync();
+            } else
+            {
+                Bookmark bookmark = new Bookmark{
+                    urlLink = newUserBookmark.url
+                };
+                bookmark.setName();
 
-            var bookmarkId = (from bm in _context.Bookmarks
-                         where bm.urlLink == bookmark.urlLink
-                         && bm.name == bookmark.name
-                         select bm.bookmarkId)
-                         .FirstOrDefault();
+                _context.Bookmarks.Add(bookmark);
+                await _context.SaveChangesAsync();
 
+                bookmarkId = (from bm in _context.Bookmarks
+                            where bm.urlLink == bookmark.urlLink
+                            && bm.name == bookmark.name
+                            select bm.bookmarkId)
+                            .FirstOrDefault();
+            }
+            
             UserBookmark userBookmark = new UserBookmark
             {
                 bookmarkId = bookmarkId,
                 userId = _userManager.GetUserId(User),
-                addedTime = new DateTime()
+                addedTime = DateTime.Now,
+                userDefinedName = newUserBookmark.bookmarkName
             };
 
             _context.UserBookmarks.Add(userBookmark);

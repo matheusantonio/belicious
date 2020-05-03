@@ -15,6 +15,8 @@ namespace belicious.Models
 
         public DateTime addedTime {get; set;}
 
+        public string userDefinedName {get; set;}
+
     }
 }
 

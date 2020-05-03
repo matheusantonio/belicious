@@ -17,7 +17,14 @@
 @foreach (var item in Model.topBookmarks)
 {
     <div>
-        <h5 class="display-7">@item.name</h5><p>@item.urlLink</p>
+        <h5 class="display-7"><a href=@item.Item1.urlLink>@item.Item1.name</a></h5><p>[@item.Item1.urlLink]</p>
+        <p>Total: @item.Item3</p>
+        <nobr>
+            @foreach (var tag in @item.Item2)
+            {
+                <small>@tag </small> 
+            }
+        </nobr>
         <hr>
     </div>
     
@@ -33,7 +40,14 @@
 @foreach (var item in Model.recentlyAdded)
 {
     <div>
-        <h5 class="display-7">@item.name</h5><p>@item.urlLink</p>
+        <h5 class="display-7"><a href=@item.Item1.urlLink>@item.Item1.name</a></h5><p>[@item.Item1.urlLink]</p>
+        <p>Time: @item.Item3.ToLocalTime()</p>
+        <nobr>
+            @foreach (var tag in @item.Item2)
+            {
+                <small>@tag </small> 
+            }
+        </nobr>
         <hr>
     </div>
     

@@ -11,19 +11,19 @@
     </div>
     <hr>
     <div>
-        @foreach (var item in @Model.bookmarks.Keys)
+        @foreach (var item in @Model.bookmarks)
         {
             <div>
-                <h5 class="display-7">@item.name</h5>
-                <p>@item.urlLink</p>
+                <h5 class="display-7">@item.Item3</h5>
+                <p>@item.Item1.urlLink</p>
                 <nobr>
-                @foreach (var tag in @Model.bookmarks[item])
+                @foreach (var tag in @item.Item2)
                 {
                     <small>@tag </small> 
                 }
                 </nobr>
                 <br>
-                <a asp-action="Remove" asp-route-bookmarkId="@item.bookmarkId">Remove</a>
+                <a asp-action="Remove" asp-route-bookmarkId="@item.Item1.bookmarkId">Remove</a>
                 <hr>
             </div>
         }
