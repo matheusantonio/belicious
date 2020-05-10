@@ -14,16 +14,18 @@
         @foreach (var item in @Model.bookmarks)
         {
             <div>
-                <h5 class="display-7">@item.Item3</h5>
+                <h5 class="display-7"><a href=@item.Item1.urlLink>@item.Item3</a></h5> @if(item.Item4){<p>[private]</p>}
+                
                 <p>@item.Item1.urlLink</p>
                 <nobr>
                 @foreach (var tag in @item.Item2)
-                {
+                { 
                     <small>@tag </small> 
                 }
                 </nobr>
                 <br>
-                <a asp-action="Remove" asp-route-bookmarkId="@item.Item1.bookmarkId">Remove</a>
+                <a asp-action="Remove" asp-route-bookmarkId="@item.Item1.bookmarkId">Remove</a> |
+                <a asp-action="Edit" asp-route-bookmarkId="@item.Item1.bookmarkId">Edit</a>
                 <hr>
             </div>
         }

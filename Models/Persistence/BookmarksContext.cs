@@ -12,7 +12,7 @@ namespace belicious.Models.Persistence
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<TagBookmark>().HasKey(table => new {
-                table.tagId, table.bookmarkId
+                table.tagId, table.bookmarkId, table.userId
             });
             builder.Entity<UserBookmark>().HasKey(table => new {
                 table.userId, table.bookmarkId

@@ -17,6 +17,8 @@ namespace belicious.Models
 
         public string userDefinedName {get; set;}
 
+        public bool isPrivate {get; set;}
+
     }
 }
 

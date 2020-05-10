@@ -33,8 +33,9 @@ namespace belicious.Controllers
             indexBookmarks.topBookmarks = new List<Tuple<Bookmark, List<string>, int>>();
 
             var topBookmarks = (from tb in (from ub in _context.UserBookmarks
-                                group ub by ub.bookmarkId into oub
-                                select new { key = oub.Key, cnt = oub.Count()})
+                                            where ub.isPrivate == false
+                                            group ub by ub.bookmarkId into oub
+                                            select new { key = oub.Key, cnt = oub.Count()})
                                 orderby tb.cnt descending
                                 select tb).Take(10);
 
@@ -58,8 +59,9 @@ namespace belicious.Controllers
             indexBookmarks.recentlyAdded = new List<Tuple<Bookmark, List<string>, DateTime>>();
 
             var recentBookmarks = (from ub in _context.UserBookmarks
+                                  where ub.isPrivate == false
                                   orderby ub.addedTime descending
-                                  select new {key = ub.bookmarkId, time = ub.addedTime}).Take(10);
+                                  select new {key = ub.bookmarkId, time = ub.addedTime, user = ub.userId}).Take(10);
 
             foreach(var bookmarkTime in recentBookmarks.ToList())
             {
@@ -67,6 +69,7 @@ namespace belicious.Controllers
                            from t in _context.Tags
                            where tb.bookmarkId == bookmarkTime.key
                            && tb.tagId == t.tagId
+                           && tb.userId == bookmarkTime.user
                            select t.tag).ToList();
 
                 indexBookmarks.recentlyAdded.Add(

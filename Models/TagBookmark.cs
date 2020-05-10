@@ -10,5 +10,8 @@ namespace belicious.Models
 
         [Key]
         public string bookmarkId {get; set;}
+
+        [Key]
+        public string userId {get; set;}
     }
 }
