@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Belicious</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <base href="~/" />
 </head>
 <body>
     <header>
@@ -32,8 +33,11 @@
                 </div>
                 <div>
                     @*Form aqui*@
-                    <input type="text">
-                    <button>Buscar</button>
+                    <form asp-action="Search" asp-controller="Home">
+                        <input name="parameter" type="text">
+                        <button type="submit" value="Search">Search</button>
+                    </form>
+                    
 
                 </div>
             </div>
@@ -50,6 +54,9 @@
             &copy; 2020 - belicious - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    
+    <script src="~/_framework/blazor.server.js"></script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

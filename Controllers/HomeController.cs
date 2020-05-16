@@ -92,5 +92,35 @@ namespace belicious.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+    
+        public IActionResult Search(string parameter)
+        {
+            var resultBookmark = (from t in _context.Tags
+                                  from tb in _context.TagBookmarks
+                                  from b in _context.Bookmarks
+                                  where parameter.Contains(t.tag)
+                                  && tb.bookmarkId == b.bookmarkId
+                                  && tb.tagId == t.tagId
+                                  select b).ToList();
+
+            /* var tags = (from t in _context.Tags
+                        select t).ToList();
+
+            Console.WriteLine(parameter);
+            foreach(var tag in tags)
+            {
+                Console.WriteLine(tag.tag);
+                Console.WriteLine(parameter.Contains(tag.tag));
+            }
+
+            Console.WriteLine(resultBookmark.Any()); */
+
+            var searchResults = new SearchResultsViewModel()
+            {
+                resultBookmark = resultBookmark
+            };
+
+            return View(searchResults);
+        }
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using System.Collections.Generic;
@@ -78,11 +79,8 @@ namespace belicious.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> New(NewBookmarkViewModel newUserBookmark)
         {
-            
-            var checkBookmark = (from bm in _context.Bookmarks
-                                where bm.urlLink == newUserBookmark.url
-                                select bm).FirstOrDefault();
-            
+            var checkBookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.urlLink == newUserBookmark.url);
+
             string bookmarkId;
             
             if(checkBookmark != null)
@@ -159,8 +157,12 @@ namespace belicious.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Remove(string bookmarkId)
+        public async Task<IActionResult> Remove(string bookmarkId)
         {
+            var bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.bookmarkId == bookmarkId);
+
+            if(bookmark == null) return NotFound();
+
             var url = from b in _context.Bookmarks
                       where b.bookmarkId == bookmarkId
                       select b.urlLink;
@@ -185,6 +187,10 @@ namespace belicious.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string bookmarkId)
         {
+            var bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.bookmarkId == bookmarkId);
+
+            if(bookmark == null) return NotFound();
+
             UserBookmark assosciation = (from ub in _context.UserBookmarks
                                         where ub.bookmarkId == bookmarkId
                                         && ub.userId == _userManager.GetUserId(User)
@@ -202,9 +208,9 @@ namespace belicious.Controllers
             return RedirectToAction(nameof(Index));
         }
     
-        public IActionResult Edit(string bookmarkId)
+        public async Task<IActionResult> Edit(string bookmarkId)
         {
-            Bookmark bookmark = _context.Bookmarks.Find(bookmarkId);
+            Bookmark bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.bookmarkId == bookmarkId);
 
             var tags = (from tb in _context.TagBookmarks
                        from t in _context.Tags
@@ -240,6 +246,8 @@ namespace belicious.Controllers
                             where ub.bookmarkId == editBookmark.bookmarkId
                             && ub.userId == _userManager.GetUserId(User)
                             select ub).FirstOrDefault();
+
+            if(userBookmark == null) return NotFound();
 
             if(userBookmark.userDefinedName != editBookmark.name
                 || userBookmark.isPrivate != editBookmark.isPrivate)

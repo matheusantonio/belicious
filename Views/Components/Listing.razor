@@ -1,0 +1,28 @@
+@using Microsoft.AspNetCore.Components
+
+@using belicious.Models
+
+
+    @for (int i = 0; i < count && i < @Results.Count(); i++)
+    {
+        <div>
+            <h5 class="display-7"><a href=@Results.ElementAt(i).urlLink>@Results.ElementAt(i).name</a></h5><p>[@Results.ElementAt(i).urlLink]</p>
+            <hr>
+        </div>
+    }
+
+    <button @onclick="loadMore">Load More</button>
+
+
+@code{
+    private int count = 5;
+
+    [Parameter]
+    public List<Bookmark> Results {get; set;}
+
+    private void loadMore()
+    {
+        if(count < Results.Count()) count += 5;
+    }
+
+}

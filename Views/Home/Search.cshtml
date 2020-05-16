@@ -1,0 +1,27 @@
+@using belicious.Views.Components
+@model belicious.Models.ViewModels.SearchResultsViewModel
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Belicious - A Bookmark App</h1>
+    <hr>
+</div>
+<br>
+<br>
+<div class="text-left">
+    <h3 class="display-5">Search Results</h3>
+
+</div>
+<hr>
+
+
+@(await Html.RenderComponentAsync<Listing>(RenderMode.ServerPrerendered, new {Results = Model.resultBookmark}))
+
+
+@* @for (int i = 0; i < 10 && i < Model.resultBookmark.Count() ; i++)
+{
+    @Model.resultBookmark.Count(); 
+}
+ *@
