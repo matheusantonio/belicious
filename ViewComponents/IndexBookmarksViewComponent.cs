@@ -24,7 +24,7 @@ namespace ViewComponents
             var model = new TopBookmarkViewModel
             {
                 topBookmarks = this.retrieveTopBookmarks(),
-                recentlyAdded = this.retrieveRecentBookmakrs()
+                recentlyAdded = this.retrieveRecentBookmarks()
             };
 
             return View(model);
@@ -60,7 +60,7 @@ namespace ViewComponents
             return topBookmarks;
         }
 
-        private List<Tuple<Bookmark, List<string>, DateTime>> retrieveRecentBookmakrs()
+        private List<Tuple<Bookmark, List<string>, DateTime>> retrieveRecentBookmarks()
         {
             var recentBookmarks = new List<Tuple<Bookmark, List<string>, DateTime>>();
 

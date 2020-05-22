@@ -64,65 +64,6 @@ namespace belicious.Controllers
         {
            return ViewComponent("IndexBookmarks");
         }
-        private List<Tuple<Bookmark, List<string>, int>> retrieveTopBookmarks()
-        {
-            var topBookmarks = new List<Tuple<Bookmark, List<string>, int>>();
-
-            var topBookmarksQuery = (from tb in (from ub in _context.UserBookmarks
-                                            where ub.isPrivate == false
-                                            group ub by ub.bookmarkId into oub
-                                            select new { key = oub.Key, cnt = oub.Count()})
-                                orderby tb.cnt descending
-                                select tb).Take(10);
-
-            foreach(var item in topBookmarksQuery.ToList())
-            {
-                string bookmarkId = item.key;
-                int qtd = item.cnt;
-
-                var tags = (from tb in _context.TagBookmarks
-                           from t in _context.Tags
-                           where tb.bookmarkId == bookmarkId
-                           && tb.tagId == t.tagId
-                           select t.tag).ToList();
-
-                topBookmarks.Add(
-                    new Tuple<Bookmark, List<string>, int>(_context.Bookmarks.Find(bookmarkId), tags, qtd)
-                );
-            }
-
-            return topBookmarks;
-        }
-    
-        private List<Tuple<Bookmark, List<string>, DateTime>> retrieveRecentBookmakrs()
-        {
-            var recentBookmarks = new List<Tuple<Bookmark, List<string>, DateTime>>();
-
-            var recentBookmarksQuery = (from ub in _context.UserBookmarks
-                                  where ub.isPrivate == false
-                                  orderby ub.addedTime descending
-                                  select new {key = ub.bookmarkId, time = ub.addedTime, user = ub.userId}).Take(10);
-
-            foreach(var bookmarkTime in recentBookmarksQuery.ToList())
-            {
-                var tags = (from tb in _context.TagBookmarks
-                           from t in _context.Tags
-                           where tb.bookmarkId == bookmarkTime.key
-                           && tb.tagId == t.tagId
-                           && tb.userId == bookmarkTime.user
-                           select t.tag).ToList();
-
-                recentBookmarks.Add(
-                    new Tuple<Bookmark, List<string>, DateTime>(_context.Bookmarks.Find(bookmarkTime.key),
-                                                                tags,
-                                                                bookmarkTime.time)
-                );
-            }
-
-            return recentBookmarks;
-
-        }
-    
 
     }
 }

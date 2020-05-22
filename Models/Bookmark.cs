@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using System;
+using System.Text;
+using HtmlAgilityPack;
 
 namespace belicious.Models
 {
@@ -38,10 +40,30 @@ namespace belicious.Models
         public void setName()
         {
             if(name != null) return;
-            string n = Regex.Replace(urlLink, @"^((https:[/]*|http:[/]*)(www)*|(www.))[.]*", "");
-            string f = Regex.Replace(n, @"[.].*$", "");
 
-            name = f;
+            string newname;
+
+            var web = new HtmlAgilityPack.HtmlWeb();
+            HtmlDocument doc = web.Load(this._urlLink);
+
+            var h1 = doc.DocumentNode.SelectSingleNode("//h1");
+            var title = doc.DocumentNode.SelectSingleNode("//title");
+            if(h1 != null && !h1.HasChildNodes)
+            {
+                newname = h1.InnerHtml.Trim();
+            }
+            else if(title != null && !title.HasChildNodes)
+            {
+                    newname = title.InnerHtml.Trim();
+            }else
+            {
+                string n = Regex.Replace(urlLink, @"^((https:[/]*|http:[/]*)(www)*|(www.))[.]*", "");
+                string f = Regex.Replace(n, @"[.].*$", "");
+                newname = f;
+
+            }
+
+            name = newname;
         }
     }
 } 
