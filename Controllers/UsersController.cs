@@ -69,7 +69,7 @@ namespace belicious.Controllers
             NewBookmarkViewModel userBookmark = new NewBookmarkViewModel
             {
                 userName = _userManager.GetUserName(User),
-                tags = new List<string>()
+                tags = ""
             };
 
             return View(userBookmark);
@@ -116,42 +116,47 @@ namespace belicious.Controllers
             _context.UserBookmarks.Add(userBookmark);
             await _context.SaveChangesAsync();
 
-            foreach(string tag in newUserBookmark.tags)
+            if(newUserBookmark.tags.Any())
             {
-                var checkTag = (from t in _context.Tags
-                               where t.tag == tag
-                               select t).FirstOrDefault();
+                var tags = newUserBookmark.tags.Split(',');
 
-                string tagId;
-
-                if(checkTag != null)
+                foreach(string tag in tags)
                 {
-                    tagId = checkTag.tagId;
+                    var checkTag = (from t in _context.Tags
+                                where t.tag == tag
+                                select t).FirstOrDefault();
 
-                } else
-                {
-                    Tag newTag = new Tag()
+                    string tagId;
+
+                    if(checkTag != null)
                     {
-                        tag = tag
-                    };
-                    _context.Tags.Add(newTag);
+                        tagId = checkTag.tagId;
+
+                    } else
+                    {
+                        Tag newTag = new Tag()
+                        {
+                            tag = tag
+                        };
+                        _context.Tags.Add(newTag);
+                        await _context.SaveChangesAsync();
+
+                        tagId = (from t in _context.Tags
+                                where t.tag == tag
+                                select t.tagId)
+                                .FirstOrDefault();
+
+                    }
+
+                    _context.TagBookmarks.Add(new TagBookmark
+                    {
+                        tagId = tagId,
+                        bookmarkId = bookmarkId,
+                        userId = _userManager.GetUserId(User)
+                    });
+
                     await _context.SaveChangesAsync();
-
-                    tagId = (from t in _context.Tags
-                            where t.tag == tag
-                            select t.tagId)
-                            .FirstOrDefault();
-
                 }
-
-                _context.TagBookmarks.Add(new TagBookmark
-                {
-                    tagId = tagId,
-                    bookmarkId = bookmarkId,
-                    userId = _userManager.GetUserId(User)
-                });
-
-                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
@@ -212,12 +217,17 @@ namespace belicious.Controllers
         {
             Bookmark bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.bookmarkId == bookmarkId);
 
-            var tags = (from tb in _context.TagBookmarks
+            var tagList = (from tb in _context.TagBookmarks
                        from t in _context.Tags
                        where tb.bookmarkId == bookmarkId
                        && tb.tagId == t.tagId
                        && tb.userId == _userManager.GetUserId(User)
                        select t.tag).ToList();
+            
+            string tags;
+
+            if(tagList.Any()) tags = tagList.Aggregate((acc , tag) => acc + "," + tag);
+            else tags = "";
 
             var name_pv = (from ub in _context.UserBookmarks
                           where ub.bookmarkId == bookmarkId
@@ -227,7 +237,7 @@ namespace belicious.Controllers
             var editModelView = new EditBookmarkViewModel
             {
                 url = bookmark.urlLink,
-                tags = tags.Any() ? tags : new List<string>(),
+                tags = tags,
                 name = name_pv.name,
                 bookmarkId = bookmarkId,
                 userName = _userManager.GetUserName(User),
@@ -241,6 +251,7 @@ namespace belicious.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditBookmarkViewModel editBookmark)
         {
+
             //1 verificar se o nome mudou e alterá-lo (salvar a bookmark após isso)
             var userBookmark = (from ub in _context.UserBookmarks
                             where ub.bookmarkId == editBookmark.bookmarkId
@@ -269,8 +280,10 @@ namespace belicious.Controllers
 
             var newTagBookmarks = new List<TagBookmark>();
 
-            if(editBookmark.tags != null){
-                foreach(string tag in editBookmark.tags)
+            var tags = editBookmark.tags.Split(',');
+
+            if(tags.Length > 0){
+                foreach(string tag in tags)
                 {
                     var checkTag = (from t in _context.Tags
                                 where t.tag == tag
@@ -314,5 +327,9 @@ namespace belicious.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+    
+    
+        
+    
     }
 }

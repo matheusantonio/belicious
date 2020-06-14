@@ -3,6 +3,7 @@
     ViewData["Title"] = @Model.userName;
 }
 
+
 <div>
     <h2 class="display-6">@Model.userName - Edit Bookmark</h2>
     <hr>
@@ -11,47 +12,37 @@
     <h5 class="display-7">@Model.name</h5>
     <p>[@Model.url]</p>
 </div>
-<div class="col-md-4">
-    <form asp-action="Edit">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="name" class="control-label"></label>
-                <input asp-for="name" class="form-control"/>
-            </div>
-            <div class="form-group">
-                <label asp-for="isPrivate" class="control-label"></label>
-                <input asp-for="isPrivate" class="form-control"/>
-            </div>
-            <div>
-                <label asp-for="tags" class="control-label"></label>
-                <input type="text" id="new-tag"/> <button id="add" type="button">+</button>
-                <select id="tags" asp-for="tags" class="form-control" multiple>
-                    @foreach (var item in @Model.tags)
-                    {
-                        <option>@item</option> 
-                    }
-                </select>
-                <input type="hidden" asp-for="bookmarkId"/>
-            </div>
-            <div class="form-group">
-                <button type="submit" value="Edit" class="btn btn-primary">Save</button>
-            </div>
-    </form>
 
+<div class="ibox-content">
+    <div class="row">
+        <div class="col-sm-6 b-r">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="name" class="control-label"></label>
+                        <input asp-for="name" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="isPrivate" class="control-label"></label>
+                        <input asp-for="isPrivate" class="form-control"/>
+                    </div>
+
+                    <div>
+                        <label asp-for="tags" class="control-label"></label>
+                        <input type="text" data-role="tagsinput" asp-for="tags" class="form-control">
+
+                    </div>
+
+                
+                    <div class="form-group">
+                        <input type="hidden" asp-for="bookmarkId"/>
+                        <button type="submit" value="Edit" class="btn btn-primary">Save</button>
+                    </div>
+            </form>
+
+        </div>
+
+    </div>
 </div>
 
-<script>
-        document.getElementById("add").addEventListener("click", addTag, false);
 
-        function addTag()
-        {
-            var tag = document.getElementById("new-tag").value;
-            var new_option = document.createElement("option");
-            new_option.selected = true;
-            new_option.text = tag;
-            new_option.value = tag;
-            var select = document.getElementById("tags");
-            select.appendChild(new_option);
-            document.getElementById("new-tag").value = "";
-        }
-</script>

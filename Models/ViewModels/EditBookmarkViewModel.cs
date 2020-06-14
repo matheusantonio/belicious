@@ -12,7 +12,7 @@ namespace belicious.Models.ViewModels
         public string name {get; set;}
 
         [Display(Name="Tags")]
-        public List<string> tags {get; set;}
+        public string tags {get; set;}
 
         [Display(Name="Private")]
         public bool isPrivate {get; set;}
