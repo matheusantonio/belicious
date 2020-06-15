@@ -15,6 +15,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using belicious.Models.Persistence;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using WebPWrecover.Services;
+
 
 namespace belicious
 {
@@ -44,6 +47,10 @@ namespace belicious
                 config.Filters.Add(new AuthorizeFilter(policy));
             });
             services.AddServerSideBlazor();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
+
             //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddRazorPages();
         }
